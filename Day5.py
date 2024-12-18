@@ -1,9 +1,6 @@
-import math
 
 with open("Day5_page_ordering_rules.txt") as file:
     page_ordering_rules = file.readlines()
-    #file.seek(0)
-    #input = file.read()
 
 with open("Day5_pages.txt") as file:
     pages = file.readlines()
@@ -16,47 +13,94 @@ pages = [line.strip() for line in pages] # make sure to get rid of whitespace, l
 # start by identifying which updates are already in the right order, conform to the rules already
 # find all the MIDDLE page numbers and add them up
 
-def check_conforms_to_rules(arr_to_check:str):
-    print(f"arr_to_check: {arr_to_check}")
+def check_conforms_to_rules(arr_to_check):
+    #print(f"arr_to_check: {arr_to_check}")
 
     for i, num in enumerate(arr_to_check):
-        print(f"for i: {i}, num: {num}")
+        #print(f"for i: {i}, num: {num}")
         for rule in page_ordering_rules:
             x = int(rule[0:2])
             y = int(rule[3:5])
             if y == num:
                 for j in range(i+1,len(arr_to_check)):
                     if arr_to_check[j] == x:
-                        print(f"for rule: {rule}, \n num == y ({y})")
-                        print(f"for j: {j}, ")
-                        print(f"arr_to_check[j] ({arr_to_check[j]}) == x ({x}), return False")
+                        #print(f"for rule: {rule}, \n num == y ({y})")
+                        #print(f"for j: {j}, ")
+                        #print(f"arr_to_check[j] ({arr_to_check[j]}) == x ({x}), return False")
                         return False
 
-    print(f"check_conforms_to_rules returning True!!!!")
+    #print(f"check_conforms_to_rules returning True!!!!")
     return True
 
 middle_numbers_total = 0
 
 for page in pages:
     page = [int(num) for num in page.split(",")]
-    print(f"---for page: {page}")
+    #print(f"---for page: {page}")
     if check_conforms_to_rules(page):
-        print(f"page CONFORMS: "); print(page)
-        print(f"page[len(page)/2]: {page[int(len(page)/2)]}")
-        print(f"middle_numbers_total += page[int(len(page)/2)]: {page[int(len(page)/2)]}")
+        #print(f"page CONFORMS: "); print(page)
+        #print(f"page[len(page)/2]: {page[int(len(page)/2)]}")
+        #print(f"middle_numbers_total += page[int(len(page)/2)]: {page[int(len(page)/2)]}")
         middle_numbers_total += int(page[int(len(page)/2)])
 
 print(f"middle_numbers_total: {middle_numbers_total}")
 
-quit()
 
 
-total_XMAS_occurances = 0
 
-for i in range(len(lines)): # i = rows, up and down
-    for j in range(len(lines[i])): # j = columns, across left and right
-        pass
 
+# Part 2
+
+def check_conforms_to_rules_and_fix(arr_to_check: list[int]):
+    #print(f"arr_to_check: {arr_to_check}")
+    doneFlag = False
+    breakFlag = 0
+    changedArr = False
+
+    while not doneFlag:
+        for i, num in enumerate(arr_to_check):
+            if breakFlag: break
+            #print(f"for i: {i}, num: {num}")
+            for rule in page_ordering_rules:
+                if breakFlag: break
+                x = int(rule[0:2])
+                y = int(rule[3:5])
+                if y == num:
+                    for j in range(i+1,len(arr_to_check)):
+                        if breakFlag: break
+                        if arr_to_check[j] == x:
+                            changedArr = True
+                            arr_to_check.pop(j)
+                            arr_to_check.insert(i,x)
+                            breakFlag = i-1
+                            #print(f"for rule: {rule}, \n num == y ({y})")
+                            #print(f"for j: {j}, ")
+                            #print(f"arr_to_check[j] ({arr_to_check[j]}) == x ({x}), return False")
+                            #return False
+                            
+        if breakFlag:
+            breakFlag = 0
+        else:
+            doneFlag = True
+    
+    if changedArr:
+        return True, arr_to_check
+    else:
+        return False, None
+    #print(f"check_conforms_to_rules returning True!!!!")
+    #return True
+
+middle_numbers_total_part2 = 0
+
+for page in pages:
+    page = [int(num) for num in page.split(",")]
+
+    changedArr, page = check_conforms_to_rules_and_fix(page)
+    if changedArr:
+        middle_numbers_total_part2 += int(page[int(len(page)/2)])
+        
+
+print(f"middle_numbers_total_part2: {middle_numbers_total_part2}")
 
 
 
