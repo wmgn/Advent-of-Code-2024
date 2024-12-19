@@ -1,40 +1,11 @@
-### Task/Problem Info/Notes
-# arrange towels
-# Every towel marked with a pattern of colored stripes
-# only a few patterns
-# for any particular pattern, can have as many towels as you want
-# Each stripe can be white (w), blue (u), black (b), red (r), or green (g).
-
-# E.g.
-# towel with pattern ggr has a green stripe, a green stripe, and then a red stripe, in that order
-# You can't reverse a pattern by flipping a towel upside-down
-
-# list of designs
-# can use any towels you want
-# all of the towels' stripes must exactly match the desired design
-
-# to display the design rgrgr, you could use:
-# two rg towels and then an r towel, 
-# an rgr towel and then a gr towel, 
-# or even a single massive rgrgr towel (assuming such towel patterns were actually available).
-
-# To start, collect together all of the available towel patterns and the list of desired designs (your puzzle input).
-
-
-
 ### Part 1 - How many designs are possible to be created with the available towel patterns?
+from functools import cache
 
 # Process and format Input
-with open("Day19.in") as file:
-    towel_patterns, designs = file.read().split("\n\n")
+towel_patterns, designs = open('Day19.in').read().split("\n\n")
+towel_patterns, designs = towel_patterns.split(', '), designs.split("\n")
 
-towel_patterns = towel_patterns.split(", ")
-designs = designs.split("\n")
-
-
-from functools import lru_cache
-
-@lru_cache(None)
+@cache
 def check_design_possible(design:str) -> bool:
     """Recursively checks if a design can be constructed using the towel patterns."""
     
@@ -52,9 +23,44 @@ def check_design_possible(design:str) -> bool:
     
 
 total_designs_possible = sum(check_design_possible(design) for design in designs)
-
 print(f"total_designs_possible: {total_designs_possible}")
 
 
 # First answer was 317, too low. But Correct answer for someone else.
 # Implemented memoization, got 360
+
+# --- Part Two ---
+
+@cache
+def check_design_ways(design: str) -> int:
+    """Returns the total number of ways to construct a design."""
+    if design == "":
+        return 1
+    
+    total_ways = 0
+    for pattern in towel_patterns:
+        if design.startswith(pattern):
+            total_ways += check_design_ways(design[len(pattern):])
+    
+    return total_ways
+
+total_design_ways = sum(check_design_ways(design) for design in designs)
+print(f"total_design_ways: {total_design_ways}")
+
+
+
+
+'''
+great solution from r/4HbQ:
+
+def count(d):
+    return d == '' or sum(count(d.removeprefix(p))
+        for p in P.split(', ') if d.startswith(p))
+
+
+results = list(map(count, designs))
+
+for type in bool, int:
+    print(sum(map(type, results)))
+'''
+
