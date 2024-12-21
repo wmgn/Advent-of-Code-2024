@@ -1,18 +1,16 @@
+from collections import defaultdict # learned about defaultdict, using type list, avoids KeyErrors by providing a default value for the key that does not exist
+
 with open("Day08.in") as file:
-    lines = file.readlines()
+    lines = [line.rstrip() for line in file]
 
-lines = [line.strip() for line in lines]
-
-chars_dict = {} # a dict of every unique char pointing to a list of grid coords where that char appears
+chars_dict = defaultdict(list) # a dict of every unique char pointing to a list of grid coords where that char appears
 for i, line in enumerate(lines):
     for j, char in enumerate(line):
         if char != ".":
-            if char not in chars_dict:
-                chars_dict[char] = []
             chars_dict[char].append((i,j))
 
 
-unique_antinode_locations = set() #of 2d coords [i,j]
+antinode_set = set() #of 2d coords [i,j]
 for char in chars_dict:
     node_coords_arr = chars_dict[char]
     #print(node_coords_arr)
@@ -31,12 +29,12 @@ for char in chars_dict:
             for node in antinode1_coords,antinode2_coords:
                 if ( 0 <= node[0] and node[0] < len(lines) 
                     and 0 <= node[1] and node[1] < len(lines[0]) ):
-                    unique_antinode_locations.add(node)
+                    antinode_set.add(node)
 
-    #print(f"\nunique_antinode_locations: {unique_antinode_locations}")
+    #print(f"\nantinode_set: {antinode_set}")
     #quit()
 
-print(f"num of unique_antinode_locations: {len(unique_antinode_locations)}")
+print(f"num of antinode_set: {len(antinode_set)}")
 
 
 
@@ -44,14 +42,14 @@ print(f"num of unique_antinode_locations: {len(unique_antinode_locations)}")
 # Part 2
 #print("\n\n\n----- part 2")
 
-unique_antinode_locations_part2 = set() #of 2d coords [i,j]
+antinode_set_part2 = set() #of 2d coords [i,j]
 for char in chars_dict:
     node_coords_arr = chars_dict[char]
     #print(f"node_coords_arr: {node_coords_arr}")
 
     if len(node_coords_arr) > 1:
         for node_coord in node_coords_arr:
-            unique_antinode_locations_part2.add(node_coord)
+            antinode_set_part2.add(node_coord)
 
     for i, node1 in enumerate(node_coords_arr):
         for j, node2 in enumerate(node_coords_arr[i+1:]): #iterate over every unique pair of 2 coords
@@ -63,8 +61,8 @@ for char in chars_dict:
             #print(f"   antinode1: {antinode1}")
             while( 0 <= antinode1[0] and antinode1[0] < len(lines)
                     and 0 <= antinode1[1] and antinode1[1] < len(lines[0]) ): # ensure antinode indices are inbounds
-                unique_antinode_locations_part2.add(antinode1)
-                #print(f"   unique_antinode_locations_part2 added antinode1")
+                antinode_set_part2.add(antinode1)
+                #print(f"   antinode_set_part2 added antinode1")
                 antinode1 = (antinode1[0]+(i1-i2), antinode1[1]+(j1-j2))
                 #print(f"   antinode1: {antinode1}")
 
@@ -72,14 +70,14 @@ for char in chars_dict:
             #print(f"   antinode2: {antinode2}")
             while( 0 <= antinode2[0] and antinode2[0] < len(lines)
                     and 0 <= antinode2[1] and antinode2[1] < len(lines[0]) ): # ensure antinode indices are inbounds
-                unique_antinode_locations_part2.add(antinode2)
-                #print(f"   unique_antinode_locations_part2 added antinode2")
+                antinode_set_part2.add(antinode2)
+                #print(f"   antinode_set_part2 added antinode2")
                 antinode2 = (antinode2[0]+(i2-i1), antinode2[1]+(j2-j1))
                 #print(f"   antinode2: {antinode2}")
                 
     #quit()
-    #print(f"\n unique_antinode_locations_part2: {unique_antinode_locations_part2}")
+    #print(f"\n antinode_set_part2: {antinode_set_part2}")
     #quit()
 
-print(f"num of unique_antinode_locations_part2: {len(unique_antinode_locations_part2)}")
+print(f"num of antinode_set_part2: {len(antinode_set_part2)}")
 
