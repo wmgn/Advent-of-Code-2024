@@ -42,12 +42,12 @@ print(f"num of unique_antinode_locations: {len(unique_antinode_locations)}")
 
 
 # Part 2
-print("\n\n\n----- part 2")
+#print("\n\n\n----- part 2")
 
 unique_antinode_locations_part2 = set() #of 2d coords [i,j]
 for char in chars_dict:
     node_coords_arr = chars_dict[char]
-    print(f"node_coords_arr: {node_coords_arr}")
+    #print(f"node_coords_arr: {node_coords_arr}")
 
     if len(node_coords_arr) > 1:
         for node_coord in node_coords_arr:
@@ -57,25 +57,25 @@ for char in chars_dict:
         for j, node2 in enumerate(node_coords_arr[i+1:]): #iterate over every unique pair of 2 coords
             i1,j1 = node1
             i2,j2 = node2
-            print(f"node1_coords: ({i1},{j1}),   node2_coords: ({i2},{j2})")
+            #print(f"node1_coords: ({i1},{j1}),   node2_coords: ({i2},{j2})")
             
             antinode1 = (i1+(i1-i2), j1+(j1-j2))
-            print(f"   antinode1: {antinode1}")
+            #print(f"   antinode1: {antinode1}")
             while( 0 <= antinode1[0] and antinode1[0] < len(lines)
                     and 0 <= antinode1[1] and antinode1[1] < len(lines[0]) ): # ensure antinode indices are inbounds
                 unique_antinode_locations_part2.add(antinode1)
-                print(f"   unique_antinode_locations_part2 added antinode1")
+                #print(f"   unique_antinode_locations_part2 added antinode1")
                 antinode1 = (antinode1[0]+(i1-i2), antinode1[1]+(j1-j2))
-                print(f"   antinode1: {antinode1}")
+                #print(f"   antinode1: {antinode1}")
 
             antinode2 = (i2+(i2-i1), j2+(j2-j1))
-            print(f"   antinode2: {antinode2}")
+            #print(f"   antinode2: {antinode2}")
             while( 0 <= antinode2[0] and antinode2[0] < len(lines)
                     and 0 <= antinode2[1] and antinode2[1] < len(lines[0]) ): # ensure antinode indices are inbounds
                 unique_antinode_locations_part2.add(antinode2)
-                print(f"   unique_antinode_locations_part2 added antinode2")
+                #print(f"   unique_antinode_locations_part2 added antinode2")
                 antinode2 = (antinode2[0]+(i2-i1), antinode2[1]+(j2-j1))
-                print(f"   antinode2: {antinode2}")
+                #print(f"   antinode2: {antinode2}")
                 
     #quit()
     #print(f"\n unique_antinode_locations_part2: {unique_antinode_locations_part2}")
