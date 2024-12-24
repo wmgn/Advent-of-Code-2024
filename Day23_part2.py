@@ -3,65 +3,66 @@ from itertools import combinations
 
 with open("Day23.in") as file:
     input = [line.rstrip().split("-") for line in file.readlines()] # input is a 2d arr, e.g. [['ab', 'cd'], ['ut', 'ts'], ['dm', 'vh']]
-
 #print(input)
 
-'''
-# option 2
-# graph
-# detect complete/connected subgraphs(s) in undirected graph (each complete/connected subgraph of size 3) -- what algorithm? 
 
-# option 3
-# sets ?
-'''
-
-# option 1
-# python dict (hashmap), where each key,value pair is an computer and an array of all the other computers its connected to
-# could then brute force check every possible permutation/combination group of 3 unique computers, searching to see if those connections exist
-# shortcomings: this method stores 2x data necessary. stores key,value pairs 'ab'=>['cd'] and 'cd'=>['ab'], redundant, since connections are not directional.
-
-connections = defaultdict(list)
-
-# for 1d arr, e.g. ['ab', 'cd'], in 2d arr
-for c1,c2 in input:
-    # e.g. 'ab','cd'
-    connections[c1].append(c2)
-    connections[c2].append(c1)
+connections = defaultdict(set)
+for a,b in input:
+    connections[a].add(b) # e.g. 'wx'=>['yz']
+    connections[b].add(a) # e.g. 'yz'=>['wx']
 #print(f"connections: {connections}")
 
 
-'''
-combos_size_3 = [] 
-for c1,c2,c3 in combinations(connections.keys(), 3):
-    #print(combination)
-    #quit()
-    if c2 in connections[c1] and c3 in connections[c1] and c3 in connections[c2]:
-        combos_size_3.append((c1,c2,c3))
-#print(f"combos_size_3: {combos_size_3}")
+networks = set()
+for a,b in combinations(connections.keys(), 2):
+    intersection = connections[a].intersection(connections[b])
+    #print(intersection)
+
+    if len(intersection) == 11:
+        networks.add(tuple(sorted([a,b,*intersection])))
+print(f"networks: {networks}")
+print(f"len(networks): {len(networks)}")
+
+
+# CHECKING
+for network in networks: # e.g. network = ('bd', 'bu', 'dv', 'gl', 'qc', 'rn', 'so', 'tm', 'wf', 'yl', 'ys', 'ze', 'zr')
+    if all(d in connections[computer] for d in network for computer in network if d != computer):
+        print(*network, sep=",")
+        break
 
 
 
-combos_size_3_begin_with_t = []
-for c1,c2,c3 in combos_size_3:
-    if c1[0] == "t" or c2[0] == "t" or c3[0] == "t":
-        combos_size_3_begin_with_t.append((c1,c2,c3))
-#print(f"combos_size_3_begin_with_t: {combos_size_3_begin_with_t}")
-
-print(len(combos_size_3_begin_with_t))
-'''
-# first answer attempt: 196. Too Low.
-# Problem I didn't notice: I was only building my hashmap with 'ab'=>'cd', but I needed to also manually add in 'cd'=>'ab'
 
 
-# Part 2. Find the largest set of computers that are all connected to each other.
 
-# Option 1. Brute force
-# Doing option 1 here:
+
+
+
+
+
+
+''' # solution from u/4HbQ
+# computers = connections.keys() # could do this line
+networks = [{c} for c in connections.keys()] # create an array of singleton sets
+for n in networks:
+    for c in connections.keys():
+        if all(d in connections[c] for d in n): n.add(c)
+print(*sorted(max(networks, key=len)), sep=',')
+quit()
+
+
+# Old code for brute force solution attempt that might have worked, but would've taken possibly years to execute
+combos_tried = 0
 finalCombo = []
-for i in range(len(connections.keys()), 0, -1):
+for i in range(4, 13):
     print(f"trying subset size i = {i}")
-    breakFlag = False
+
     for combo in combinations(connections.keys(), i):
+        combos_tried += 1
+        if combos_tried % 1000000 == 0:
+            print(f"combos_tried: {combos_tried} / ")
+        #print(f"    trying combo: {combo}")
+
         failFlag = False
         for a,b in combinations(combo, 2):
             if b not in connections[a]:
@@ -69,15 +70,12 @@ for i in range(len(connections.keys()), 0, -1):
                 break
         if failFlag:
             continue
-        else:
+        else: # succeeded
             finalCombo = combo
-            breakFlag = True
             break
-    if breakFlag:
-        break
         #print(combo)
 
-        #print(combination)
+        #print(combination) 
         #quit()
         #if c2 in connections[c1] and c3 in connections[c1] and c3 in connections[c2]:
         #    combos_size_3.append((c1,c2,c3))
@@ -85,6 +83,34 @@ for i in range(len(connections.keys()), 0, -1):
 finalComboSorted = sorted(finalCombo)
 print(len(finalComboSorted))
 print(finalComboSorted)
-print("".join(finalComboSorted))
+print(",".join(finalComboSorted))
+'''
 
-# Option 2. Something smarter.
+
+### Brainstorming Solutions
+'''
+# option 2
+# graph
+# find cycle works because a fully connected graph of size 3 is a cycle, even if it wouldn't be for size 4 or higher
+# detect complete/connected subgraphs(s) in undirected graph (each complete/connected subgraph of size 3) -- what algorithm? Googled: Bron–Kerbosch algorithm
+# adjacency list
+# adjacency matrix
+
+# option 3
+# sets ? use sets that have the greatest intersections with eachother?
+'''
+
+# option 1
+# python dict (hashmap), where each key,value pair is an computer and an array of all the other computers its connected to
+# could then brute force check every possible permutation/combination group of 3 unique computers, searching to see if those connections exist
+# shortcomings: this method stores 2x data necessary. stores key,value pairs 'ab'=>['cd'] and 'cd'=>['ab'], redundant, since connections are not directional.
+
+# Part 2. Find the largest set of computers that are all connected to each other.
+
+# instead of trying to come up with every possible combination,
+# use the connections that are already there, to try to create/assemble a connected set
+# every single key has 13 connections
+'''keys_and_sizes = []
+for tup in connections.items():
+    keys_and_sizes.append((tup[0],len(tup[1])))
+print(keys_and_sizes)'''
